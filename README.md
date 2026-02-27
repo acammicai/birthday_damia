@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html>
 <head>
 <title>Happy Birthday Damia 🌌❤️</title>
@@ -186,3 +186,4 @@ function startParty(){
 </script>
 </body>
 </html>
+
