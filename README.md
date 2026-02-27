@@ -1,9 +1,8 @@
 # birthday_damia
-happy birthdayy damia
 <!DOCTYPE html>
 <html>
 <head>
-<title>Happy Birthday Damiaaa 🌌❤️</title>
+<title>Happy Birthday Damia 🌌❤️</title>
 <style>
 /* Body setup */
 body {
@@ -13,27 +12,25 @@ body {
     background:black;
     font-family: Arial, sans-serif;
     color:white;
-    display:flex;
-    justify-content:center;
-    align-items:center;
     height:100vh;
-    text-align:center;
+    width:100vw;
+    position:relative; /* for absolute centering */
 }
 
-/* Canvas for stars & confetti */
+/* Canvas for stars & fireworks */
 canvas {
     position:fixed;
     top:0;
     left:0;
-    z-index:0;            /* behind everything */
-    pointer-events:none;   /* clicks pass through */
+    z-index:0;
+    pointer-events:none;
 }
 
 /* Glowing text */
 h1 {
     font-size:55px;
-    z-index:1;
     animation: glow 2s ease-in-out infinite alternate;
+    position: relative;
 }
 
 @keyframes glow {
@@ -51,17 +48,18 @@ button {
     cursor:pointer;
     background:#ff69b4;
     color:white;
-    z-index:1;
     transition:0.3s;
 }
-button:hover {
-    transform:scale(1.1);
-}
+button:hover { transform:scale(1.1); }
 
-/* Container above canvas */
+/* Container centered */
 div.container {
-    position: relative;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform: translate(-50%, -50%);
     z-index:10; /* above canvas */
+    text-align:center;
 }
 
 /* Love emoji animation */
@@ -79,43 +77,28 @@ div.container {
 </head>
 
 <body>
-
-<!-- Text + button container -->
 <div class="container">
-    <h1>✨ Happy Birthday Damiaaa ✨</h1>
+    <h1>✨ Happy Birthday Damia ✨</h1>
     <button onclick="startParty()">Start Celebration 🎊</button>
 </div>
 
-<!-- Canvas for stars & confetti -->
 <canvas id="stars"></canvas>
 
-<!-- Music -->
 <audio id="music" loop>
     <source src="love.mp3" type="audio/mpeg">
 </audio>
 
 <script>
-// Button function
-function startParty(){
-    document.getElementById("music").play();
-    drawStars();
-    launchConfetti();
-    spawnLoveEmojis();
-}
-
-/* Night Sky Stars */
+// Canvas setup
 const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+// Stars
 let stars = [];
 for(let i=0;i<200;i++){
-    stars.push({
-        x:Math.random()*canvas.width,
-        y:Math.random()*canvas.height,
-        size:Math.random()*2,
-        speed:Math.random()*0.5
-    });
+    stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:Math.random()*2,speed:Math.random()*0.5});
 }
 function drawStars(){
     ctx.clearRect(0,0,canvas.width,canvas.height);
@@ -125,24 +108,16 @@ function drawStars(){
         ctx.arc(star.x,star.y,star.size,0,Math.PI*2);
         ctx.fill();
         star.y+=star.speed;
-        if(star.y>canvas.height){
-            star.y=0;
-            star.x=Math.random()*canvas.width;
-        }
+        if(star.y>canvas.height){star.y=0;star.x=Math.random()*canvas.width;}
     });
     requestAnimationFrame(drawStars);
 }
 
-/* Confetti */
+// Confetti
 function launchConfetti(){
-    let pieces = [];
+    let pieces=[];
     for(let i=0;i<100;i++){
-        pieces.push({
-            x:Math.random()*canvas.width,
-            y:Math.random()*canvas.height,
-            size:Math.random()*6,
-            speed:Math.random()*2+1
-        });
+        pieces.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:Math.random()*6,speed:Math.random()*2+1});
     }
     function drawConfetti(){
         pieces.forEach(p=>{
@@ -156,19 +131,59 @@ function launchConfetti(){
     drawConfetti();
 }
 
-/* Love emojis */
+// Love emojis around text
 function spawnLoveEmojis(){
+    const text = document.querySelector("h1");
     setInterval(()=>{
         let love = document.createElement("div");
         love.className="love";
         love.innerHTML="❤️";
-        love.style.left=Math.random()*100+"vw";
+        let rect = text.getBoundingClientRect();
+        love.style.left = rect.left + rect.width/2 + (Math.random()*200-100) + "px";
+        love.style.top = rect.top + (Math.random()*50-25) + "px";
         love.style.animationDuration=(Math.random()*2+2)+"s";
         document.body.appendChild(love);
         setTimeout(()=>love.remove(),4000);
     },300);
 }
-</script>
 
+// Fireworks
+let fireworks=[];
+function createFirework(){
+    let x = Math.random()*canvas.width;
+    let y = Math.random()*canvas.height/2;
+    for(let i=0;i<30;i++){
+        fireworks.push({
+            x:x,
+            y:y,
+            dx:(Math.random()-0.5)*5,
+            dy:(Math.random()-0.5)*5,
+            color:`hsl(${Math.random()*360},100%,60%)`,
+            life:30
+        });
+    }
+}
+function drawFireworks(){
+    fireworks.forEach((f,i)=>{
+        ctx.fillStyle=f.color;
+        ctx.beginPath();
+        ctx.arc(f.x,f.y,3,0,Math.PI*2);
+        ctx.fill();
+        f.x+=f.dx; f.y+=f.dy; f.life--;
+        if(f.life<=0) fireworks.splice(i,1);
+    });
+    requestAnimationFrame(drawFireworks);
+}
+
+// Start Party
+function startParty(){
+    document.getElementById("music").play();
+    drawStars();
+    launchConfetti();
+    spawnLoveEmojis();
+    setInterval(createFirework,800);
+    drawFireworks();
+}
+</script>
 </body>
 </html>
